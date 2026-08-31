@@ -1,7 +1,7 @@
 Summary: The GNU data compression program
 Name: gzip
 Version: 1.12
-Release: 1%{?dist}
+Release: 2%{?dist}
 # info pages are under GFDL license
 License: GPLv3+ and GFDL
 Source0: http://ftp.gnu.org/gnu/gzip/gzip-%{version}.tar.xz
@@ -11,8 +11,16 @@ Source1: https://www.gnu.org/licenses/fdl-1.3.txt
 Source100: colorzgrep.csh
 Source101: colorzgrep.sh
 
-Patch1: gnulib.patch
+#Patch1: gnulib.patch
 Patch2: gzexe.patch
+#https://cgit.git.savannah.gnu.org/cgit/gzip.git/commit/?id=4e6f8b24ab823146ab8776f0b7fe486ab34d4269
+Patch3: CVE-2026-41991.patch
+# Regarding the following two links:
+# The second one reverts the first one and then applies the changes, 
+# since the first one is not being used here, the reverting part has been removed
+#https://cgit.git.savannah.gnu.org/cgit/gzip.git/commit/?id=63dbf6b3b9e6e781df1a6a64e609b10e23969681 
+#http://cgit.git.savannah.gnu.org/cgit/gzip.git/commit/?id=e7378c2d421be6a286922374425680bbe9ad8b7d 
+Patch4: CVE-2026-41992.patch
 
 # Fixed in upstream code.
 # http://thread.gmane.org/gmane.comp.gnu.gzip.bugs/378
@@ -42,6 +50,8 @@ very commonly used data compression program.
 %setup -q
 #%patch1 -p1 -b .gnulib
 %patch2 -p1 -b .gzexe
+%patch3 -p1
+%patch4 -p1
 cp %{SOURCE1} .
 autoreconf
 
@@ -90,6 +100,12 @@ install -p -m 644 %{SOURCE101} %{buildroot}%{profiledir}
 %{profiledir}/*
 
 %changelog
+* Fri Aug 14 2026 Jakub Martisko <jamartis@redhat.com> - 1.12-2
+- Fix an issue with a temporary file creations when mktemp is missing (41991)
+- Fix a global buffer overflow vulnerability in the LZH decompression logic (41992)
+Resolves: CVE-2026-41991
+Resolves: CVE-2026-41992
+
 * Fri Apr 22 2022 Jakub Martisko <jamartis@redhat.com> - 1.12-1
 - Rebase to gzip 1.12
 - Resolves an arbitrary-file-write vulnerability in zgrep
