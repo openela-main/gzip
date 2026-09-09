@@ -1,7 +1,7 @@
 Summary: The GNU data compression program
 Name: gzip
 Version: 1.9
-Release: 13%{?dist}
+Release: 15%{?dist}
 # info pages are under GFDL license
 License: GPLv3+ and GFDL
 Group: Applications/File
@@ -27,6 +27,15 @@ Patch8: ibm5.patch
 Patch9: cve-2022-1271-part1.patch
 Patch10: cve-2022-1271-part2.patch
 Patch11: cve-2022-1271-part3.patch
+
+#https://cgit.git.savannah.gnu.org/cgit/gzip.git/commit/?id=4e6f8b24ab823146ab8776f0b7fe486ab34d4269
+Patch12: CVE-2026-41991.patch
+# Regarding the following two links:
+# The second one reverts the first one and then applies the changes, 
+# since the first one is not being used here, the reverting part has been removed
+#https://cgit.git.savannah.gnu.org/cgit/gzip.git/commit/?id=63dbf6b3b9e6e781df1a6a64e609b10e23969681 
+#http://cgit.git.savannah.gnu.org/cgit/gzip.git/commit/?id=e7378c2d421be6a286922374425680bbe9ad8b7d 
+Patch13: CVE-2026-41992.patch
 
 # Fixed in upstream code.
 # http://thread.gmane.org/gmane.comp.gnu.gzip.bugs/378
@@ -58,13 +67,14 @@ very commonly used data compression program.
 %patch2 -p1 -b .gzexe
 %patch3 -p1 -b .ibm
 %patch4 -p1 -b .ibm2
-#%patch5 -p1 -b .ibm3
 %patch6 -p1 -b .ibm4
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
+%patch13 -p1
 cp %{SOURCE1} .
 autoreconf
 
@@ -126,6 +136,17 @@ fi
 %{profiledir}/*
 
 %changelog
+* Tue Aug 18 2026 Jakub Martisko <jamartis@redhat.com> - 1.9-15
+- Fix the wrong date in the previous changelog message
+- There's an updated version of the CVE-2026-41992 fix
+Resolves: CVE-2026-41992
+
+* Fri Aug 14 2026 Jakub Martisko <jamartis@redhat.com> - 1.9-14
+- Fix an issue with a temporary file creations when mktemp is missing (41991)
+- Fix a global buffer overflow vulnerability in the LZH decompression logic (41992)
+Resolves: CVE-2026-41991
+Resolves: CVE-2026-41992
+
 * Tue Apr 19 2022 Jakub Martisko <jamartis@redhat.com> - 1.9-13
 - fix an arbitrary-file-write vulnerability in zgrep
 Resolves: CVE-2022-1271
